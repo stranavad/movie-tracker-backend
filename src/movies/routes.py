@@ -96,7 +96,7 @@ class MovieIds(Resource):
             to_return = []
             result = mycursor.fetchall()
             for res in result:
-                to_return.append(res[0])
+                to_return.append(res[1])
             return {"message": "ok", "movies": to_return}
         except:
             print("Something doesn't work")
