@@ -46,6 +46,7 @@ class Movies(Resource):
             try:
                 mycursor.execute(f"SELECT * FROM {user_id}_movies")
                 result = mycursor.fetchall()
+                mydb.close()
             except mysql.connector.Error as e:
                 mydb.close()
                 print(e.errno)
@@ -95,6 +96,7 @@ class Movies(Resource):
         try:
             mycursor.execute(sql, values)
             mydb.commit()
+            mydb.close()
         except mysql.connector.Error as e:
             print(e.errno)
             mydb.close()
@@ -121,7 +123,9 @@ class MovieIds(Resource):
         try:
             mycursor.execute(f"SELECT * FROM {user_id}_movies")
             result = mycursor.fetchall()
+            mydb.close()
         except mysql.connector.Error as e:
+            mydb.close()
             print(e.errno)
             return json.dumps({"code": 102})
 
