@@ -129,6 +129,7 @@ class MovieIds(Resource):
             print(e.errno)
             return json.dumps({"code": 102})
 
+        to_return = []
         for res in result:
             to_return.append(res[1])
-        return json.dumps({"code": "104", "movies": to_return})
+        return json.dumps({"code": 104, "movies": to_return})
