@@ -28,7 +28,7 @@ class Movies(Resource):
             mydb, mycursor = get_connection()
         except mysql.connector.Error as e:
             print(e.errno)
-            return json.dumps({"code": 01, "errno": e.errno})
+            return json.dumps({"code": 1, "errno": e.errno})
 
         try:
             mycursor.execute("SHOW TABLES")
@@ -87,7 +87,7 @@ class Movies(Resource):
             mydb, mycursor = get_connection()
         except mysql.connector.Error as e:
             print(e.errno)
-            return json.dumps({"code": 01, "errno": e.errno})
+            return json.dumps({"code": 1, "errno": e.errno})
 
         sql = f"INSERT INTO {args['id']}_movies (movie_id, title, photo, year, rating) VALUES (%s, %s, %s, %s, %s)"
         values = (args["movie_id"], args["title"], args["photo"], args["year"], args["rating"])
@@ -116,7 +116,7 @@ class MovieIds(Resource):
             mydb, mycursor = get_connection()
         except mysql.connector.Error as e:
             print(e.errno)
-            return json.dumps({"code": 01, "errno": e.errno})
+            return json.dumps({"code": 1, "errno": e.errno})
 
         try:
             mycursor.execute(f"SELECT * FROM {user_id}_movies")

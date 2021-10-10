@@ -1,8 +1,8 @@
 # Codes for communication between frontend and backend
 
-### 0x - Init
+### x - Init
 
-#### 01 - MySQL
+#### 1 - MySQL
 Cant estabilish connection to MySQL server
 
 
