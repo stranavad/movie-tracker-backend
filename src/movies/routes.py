@@ -17,6 +17,11 @@ user_post.add_argument("year", help="movie year", required="false", type=int)
 user_post.add_argument("rating", help="user rating", required="true", type=int)
 # user_post.add_argument("notes", help="user notes", required="false", type=str)
 
+delete_movie = reqparse.RequestParser()
+delete_movie.add_argument("id", help="user id", required="true", type=str)
+delete_movie.add_argument("movie_id", type=int, help="Movie id from table", required="true") # binary search
+
+
 class Movies(Resource):
     @cross_origin(supports_credentials=True)
     def get(self):
@@ -58,6 +63,7 @@ class Movies(Resource):
             return_dict = {"movies": {}, "code": 104}
             for res in result:
                 return_dict["movies"][res[1]] = {
+                "movie_table_id": res[0],
                 "title": res[2],
                 "photo": res[3],
                 "year": res[4],
@@ -103,6 +109,28 @@ class Movies(Resource):
             return json.dumps({"code": 111, "errno": e.errno})
 
         return json.dumps({"code": 112})
+
+    @cross_origin(supports_credentials=True)
+    def delete(self):
+        args = delete_movie.parse_args()
+        try:
+            mydb, mycursor = get_connection()
+        except mysql.connector.Error as e:
+            print(e.errno)
+            return json.dumps({"code": 1, "errno": e.errno})
+
+        try :
+            print(args["id"])
+            print(args["movie_id"])
+            mycursor.execute(f"DELETE FROM {args['id']}_movies WHERE id={args['movie_id']}")
+            mydb.commit()
+            mydb.close()
+        except mysql.connector.Error as e:
+            print(e.errno)
+            return json.dumps({"code": 121, "errno": e.errno})
+
+        return json.dumps({"code": 122})
+
 
 
 get_movie_id = reqparse.RequestParser()

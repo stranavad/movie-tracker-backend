@@ -34,3 +34,11 @@ Cannot insert movie into user table
 
 #### 112 - OK
 Data was pushed to the table
+
+
+### 12x
+
+#### 121 - Data wasn't deleted
+
+#### 122 - OK
+returned
