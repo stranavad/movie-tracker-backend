@@ -16,6 +16,8 @@ user_post.add_argument("year", help="movie year", required="false", type=int)
 # user_post.add_argument("category", help="movie category", required="true", type=str)
 user_post.add_argument("rating", help="user rating", required="true", type=int)
 # user_post.add_argument("notes", help="user notes", required="false", type=str)
+user_post.add_argument("overview", help="movie description", type=str)
+user_post.add_argument("genres", help="array of genre names", type=list)
 
 delete_movie = reqparse.RequestParser()
 delete_movie.add_argument("id", help="user id", required="true", type=str)
@@ -62,18 +64,20 @@ class Movies(Resource):
 
             return_dict = {"movies": {}, "code": 104}
             for res in result:
-                return_dict["movies"][res[1]] = {
-                "movie_table_id": res[0],
-                "title": res[2],
-                "photo": res[3],
-                "year": res[4],
-                "rating": res[5],
+                data_object = json.loads(res[1])
+                return_dict["movies"][data_object["movie_id"]] = {
+                    "movie_table_id": res[0],
+                    "title": data_object["title"],
+                    "photo": data_object["photo"],
+                    "year": data_object["year"],
+                    "rating": data_object["rating"],
                 }
 
             return json.dumps(return_dict)
         else:
             # creating table for the first time
-            sql = f"CREATE TABLE {user_id}_movies (id INT AUTO_INCREMENT PRIMARY KEY, movie_id INT, title VARCHAR(255), photo VARCHAR(255), year INT, rating INT)"
+            # sql = f"CREATE TABLE {user_id}_movies (id INT AUTO_INCREMENT PRIMARY KEY, movie_id INT, title VARCHAR(255), photo VARCHAR(255), year INT, rating INT)"
+            sql = f"CREATE TABLE {user_id}_movies (id INT AUTO_INCREMENT PRIMARY KEY, movie JSON)"
 
             try:
                 mycursor.execute(sql)
@@ -96,8 +100,17 @@ class Movies(Resource):
             print(e.errno)
             return json.dumps({"code": 1, "errno": e.errno})
 
-        sql = f"INSERT INTO {args['id']}_movies (movie_id, title, photo, year, rating) VALUES (%s, %s, %s, %s, %s)"
-        values = (args["movie_id"], args["title"], args["photo"], args["year"], args["rating"])
+        movie_object = {
+            "movie_id": args["movie_id"],
+            "title": args["title"],
+            "photo": args["photo"],
+            "year": args["year"],
+            "rating": args["rating"],
+            "overview": args["overview"],
+            "genres": args["genres"]
+        }
+        sql = f"INSERT INTO {args['id']}_movies (movie) VALUES (%s)"
+        values = (json.dumps(movie_object),)
 
         try:
             mycursor.execute(sql, values)
@@ -159,5 +172,6 @@ class MovieIds(Resource):
 
         to_return = []
         for res in result:
-            to_return.append(res[1])
+            movie_id = json.loads(res[1])["movie_id"]
+            to_return.append(movie_id)
         return json.dumps({"code": 104, "movies": to_return})
