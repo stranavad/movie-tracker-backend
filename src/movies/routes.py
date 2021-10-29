@@ -17,7 +17,7 @@ user_post.add_argument("year", help="movie year", required="false", type=int)
 user_post.add_argument("rating", help="user rating", required="true", type=int)
 # user_post.add_argument("notes", help="user notes", required="false", type=str)
 user_post.add_argument("overview", help="movie description", type=str)
-user_post.add_argument("genres", help="array of genre names", type=list)
+user_post.add_argument("genres", action='append', type=str)
 
 delete_movie = reqparse.RequestParser()
 delete_movie.add_argument("id", help="user id", required="true", type=str)
@@ -71,6 +71,8 @@ class Movies(Resource):
                     "photo": data_object["photo"],
                     "year": data_object["year"],
                     "rating": data_object["rating"],
+                    "overview": data_object["overview"],
+                    "genres": data_object["genres"]
                 }
 
             return json.dumps(return_dict)
@@ -100,6 +102,7 @@ class Movies(Resource):
             print(e.errno)
             return json.dumps({"code": 1, "errno": e.errno})
 
+        print(args["genres"])
         movie_object = {
             "movie_id": args["movie_id"],
             "title": args["title"],
@@ -109,6 +112,7 @@ class Movies(Resource):
             "overview": args["overview"],
             "genres": args["genres"]
         }
+        # print("genres: " + str(args["genres"]))
         sql = f"INSERT INTO {args['id']}_movies (movie) VALUES (%s)"
         values = (json.dumps(movie_object),)
 
