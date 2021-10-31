@@ -5,10 +5,10 @@ import mysql.connector  # just for errors
 import json
 
 user_get = reqparse.RequestParser()
-user_get.add_argument("id", help="user id", required="true", type=str)
+user_get.add_argument("user_id", help="user id", required="true", type=str)
 
 user_post = reqparse.RequestParser()
-user_post.add_argument("id", help="user id", required="true", type=str)
+user_post.add_argument("user_id", help="user id", required="true", type=str)
 user_post.add_argument("movie_id", help="movie id", required="true", type=int)
 user_post.add_argument("title", help="movie title", required="true", type=str)
 user_post.add_argument("photo", help="movie photo url", required="true", type=str)
@@ -20,7 +20,7 @@ user_post.add_argument("overview", help="movie description", type=str)
 user_post.add_argument("genres", action='append', type=str)
 
 delete_movie = reqparse.RequestParser()
-delete_movie.add_argument("id", help="user id", required="true", type=str)
+delete_movie.add_argument("user_id", help="user id", required="true", type=str)
 delete_movie.add_argument("movie_id", type=int, help="Movie id from table", required="true") # binary search
 
 
@@ -30,7 +30,7 @@ class Movies(Resource):
         # Get token from frontend and based on that return list off all Movies
         # Table name is the id
         # Error check
-        user_id = user_get.parse_args()["id"]
+        user_id = user_get.parse_args()["user_id"]
         try:
             mydb, mycursor = get_connection()
         except mysql.connector.Error as e:
@@ -113,7 +113,7 @@ class Movies(Resource):
             "genres": args["genres"]
         }
         # print("genres: " + str(args["genres"]))
-        sql = f"INSERT INTO {args['id']}_movies (movie) VALUES (%s)"
+        sql = f"INSERT INTO {args['user_id']}_movies (movie) VALUES (%s)"
         values = (json.dumps(movie_object),)
 
         try:
@@ -137,9 +137,7 @@ class Movies(Resource):
             return json.dumps({"code": 1, "errno": e.errno})
 
         try :
-            print(args["id"])
-            print(args["movie_id"])
-            mycursor.execute(f"DELETE FROM {args['id']}_movies WHERE id={args['movie_id']}")
+            mycursor.execute(f"DELETE FROM {args['user_id']}_movies WHERE id={args['movie_id']}")
             mydb.commit()
             mydb.close()
         except mysql.connector.Error as e:
@@ -151,13 +149,13 @@ class Movies(Resource):
 
 
 get_movie_id = reqparse.RequestParser()
-get_movie_id.add_argument("id", help="user id", type=str, required=True)
+get_movie_id.add_argument("user_id", help="user id", type=str, required=True)
 
 class MovieIds(Resource):
     @cross_origin(supports_credentials=True)
     def get(self):
         # get movies from database
-        user_id = get_movie_id.parse_args()["id"]
+        user_id = get_movie_id.parse_args()["user_id"]
 
         try:
             mydb, mycursor = get_connection()
